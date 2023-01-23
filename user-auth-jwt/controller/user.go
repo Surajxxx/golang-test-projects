@@ -90,15 +90,56 @@ func Login(req *fiber.Ctx) error {
 		"exp":    time.Now().Add(time.Hour * 72).Unix(),
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	secret := []byte(config.Config("JWT_SECRET"))
-	t, err := token.SignedString(secret)
+	t, err1 := token.SignedString(secret)
 
-	if err != nil {
-		return req.Status(500).JSON(fiber.Map{"status": "error", "message": "server error ", "data": err})
+	if err1 != nil {
+		return req.Status(500).JSON(fiber.Map{"status": "error", "message": "server error ", "data": err1})
 	}
 
-	return nil
+	return req.Status(200).JSON(fiber.Map{"status": "success", "message": "login successful", "data": t})
 
+}
+
+func GetUser(req *fiber.Ctx) error{
+	userId, err := req.ParamsInt("id")
+
+	fmt.Println(req.Locals("userId"))
+
+	if err != nil {
+		return req.Status(400).JSON(fiber.Map{"status": "error", "message": "id is required", "data": nil})
+	}
+
+	headers := req.GetReqHeaders()
+
+	token := headers["Authorization"]
+
+	fmt.Println(userId)
+	fmt.Println(token)
+
+	userModel := db.DB
+
+	var user model.User
+
+	result := userModel.Where(&model.User{Id : uint(userId)}).Find(&user)
+
+	if result.Error != nil {
+		return req.Status(400).JSON(fiber.Map{"status": "error", "message": "user not found", "data": nil})
+	}
+
+	type Response struct {
+		Username string  `json:"username"`
+		Email string  `json:"email"`
+	}
+
+	finalResult := Response{
+		Username : user.Username,
+		Email:  user.Email,
+	}
+
+	fmt.Println(finalResult)
+
+	return req.Status(200).JSON(fiber.Map{"status": "success", "message": "user details", "data": finalResult})
 }

@@ -2,6 +2,7 @@ package router
 
 import (
 	"user-auth-jwt/controller"
+	"user-auth-jwt/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -23,5 +24,6 @@ func Routing(app *fiber.App) {
 
 	user.Post("/create", controller.CreateUser)
 	user.Post("/login", controller.Login)
+	user.Get("/:id",middleware.Authentication ,controller.GetUser)
 
 }

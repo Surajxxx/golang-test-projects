@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -16,3 +15,4 @@ func ComparePassword(password, hashedPassword string) error {
 	fmt.Println("error", err)
 	 return err
 }
+
