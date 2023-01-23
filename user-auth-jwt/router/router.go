@@ -22,5 +22,6 @@ func Routing(app *fiber.App) {
 	user := app.Group("/user", logger.New())
 
 	user.Post("/create", controller.CreateUser)
+	user.Post("/login", controller.Login)
 
 }
